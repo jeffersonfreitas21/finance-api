@@ -1,5 +1,7 @@
 package dev.jeffersonfreitas.finances.model.dto;
 
+import javax.validation.constraints.NotEmpty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +15,10 @@ public class StateDTO {
 	
 	private Long id;
 	
+	@NotEmpty
 	private String nome;
 	
+	@NotEmpty
 	private String uf;
 
 }

@@ -58,6 +58,32 @@ public class StateControllerTest {
 			.andExpect(MockMvcResultMatchers.jsonPath("uf").value(dto.getUf()));		
 	}
 	
+	@Test
+	@DisplayName("Throw error when a state is not valid")
+	public void invalidStateToSave() throws Exception {
+		String json = new ObjectMapper().writeValueAsString(new StateDTO());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(API_STATE)
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.accept(MediaType.APPLICATION_JSON_VALUE)
+			.content(json);
+		
+		mvc.perform(request).andExpect(MockMvcResultMatchers.status().isBadRequest());
+	}
+	
+	
+//	@Test
+//	@DisplayName("Should find a state by id")
+//	public void findStateByIdTest() {
+//		Long id = 1l;
+//		StateDTO findedState = createNewDTO();
+//		findedState.setId(id);
+//		BDDMockito.given(service.findById(id)).willReturn(findedState);
+//		
+//		MockMvcRequestBuilders.get(API_STATE.concat(id.toString()))
+//			.acce
+//	}
+	
 	
 	private StateDTO createNewDTO() {
 		return StateDTO.builder().nome("State of Ceara").uf("CE").build();
