@@ -1,5 +1,7 @@
 package dev.jeffersonfreitas.finances.controller;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +38,7 @@ public class StateControllerTest {
 	StateService service;
 	
 	
+	//CADASTRAR
 	@Test
 	@DisplayName("Should create a new state")
 	public void createNewState() throws Exception{
@@ -58,6 +61,8 @@ public class StateControllerTest {
 			.andExpect(MockMvcResultMatchers.jsonPath("uf").value(dto.getUf()));		
 	}
 	
+	
+	//ERRO VALIDAÇÃO AO CADASTRAR
 	@Test
 	@DisplayName("Throw error when a state is not valid")
 	public void invalidStateToSave() throws Exception {
@@ -71,18 +76,70 @@ public class StateControllerTest {
 		mvc.perform(request).andExpect(MockMvcResultMatchers.status().isBadRequest());
 	}
 	
+
+	@Test
+	@DisplayName("Should find a state by id")
+	public void findStateByIdTest() throws Exception{
+		Long id = 1l;
+		State state = State.builder().id(id).nome("State").uf("ST").build();
+		BDDMockito.given(service.findById(id)).willReturn(Optional.of(state));
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(API_STATE.concat("/" + id))
+				.accept(MediaType.APPLICATION_JSON_VALUE);
+		
+		mvc.perform(request)
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andExpect(MockMvcResultMatchers.jsonPath("nome").value(state.getNome()))
+		.andExpect(MockMvcResultMatchers.jsonPath("uf").value(state.getUf()));
+	}
 	
-//	@Test
-//	@DisplayName("Should find a state by id")
-//	public void findStateByIdTest() {
-//		Long id = 1l;
-//		StateDTO findedState = createNewDTO();
-//		findedState.setId(id);
-//		BDDMockito.given(service.findById(id)).willReturn(findedState);
-//		
-//		MockMvcRequestBuilders.get(API_STATE.concat(id.toString()))
-//			.acce
-//	}
+	
+	@Test
+	@DisplayName("Throw error when not found state by id")
+	public void notFindStateByIdTest() throws Exception{
+		Long id = 1l;
+		BDDMockito.given(service.findById(id)).willReturn(Optional.empty());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.get(API_STATE.concat("/" + id))
+				.accept(MediaType.APPLICATION_JSON_VALUE);
+		
+		mvc.perform(request)
+		.andExpect(MockMvcResultMatchers.status().isNotFound());
+	}
+	
+
+	@Test
+	@DisplayName("Should delete a bank")
+	public void deleteBankTest() throws Exception {
+		Long id = 1l;
+		State state = State.builder().id(id).nome("State").uf("ST").build();
+		BDDMockito.given(service.findById(id)).willReturn(Optional.of(state));
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete(API_STATE.concat("/" + id));
+		
+		mvc.perform(request).andExpect(MockMvcResultMatchers.status().isNoContent());
+	}
+	
+	
+	@Test
+	@DisplayName("Throw error when not found a state to delete")
+	public void notFoundForDeleteStateTest() throws Exception{
+		BDDMockito.given(service.findById(1l)).willReturn(Optional.empty());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.delete(API_STATE.concat("/1"));
+		
+		mvc.perform(request).andExpect(MockMvcResultMatchers.status().isNotFound());
+	}
+	
+	
+	
+	//ATUALIZAR
+	
+	//ERRO NÃO ENCONTRAR REGISTRO PRA ATUALIZAR
+	
+	//FILTRAR
+	
+	
 	
 	
 	private StateDTO createNewDTO() {

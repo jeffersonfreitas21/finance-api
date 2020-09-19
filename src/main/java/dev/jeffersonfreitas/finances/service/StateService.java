@@ -1,11 +1,14 @@
 package dev.jeffersonfreitas.finances.service;
 
+import java.util.Optional;
+
 import dev.jeffersonfreitas.finances.model.State;
-import dev.jeffersonfreitas.finances.model.dto.StateDTO;
 
 public interface StateService {
 
 	State saveState(State state);
 	
-	StateDTO findById(Long id);
+	Optional<State> findById(Long id);
+
+	void delete(State state);
 }
