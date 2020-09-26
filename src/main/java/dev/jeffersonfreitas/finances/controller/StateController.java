@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -47,5 +48,16 @@ public class StateController {
 	public void delete(@PathVariable Long id) {
 		State state = service.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		service.delete(state);
+	}
+	
+	
+	@PutMapping("{id}")
+	public StateDTO update(@PathVariable Long id, StateDTO dto) {
+		return service.findById(id).map(s -> {
+			s.setNome(dto.getNome());
+			s.setUf(dto.getUf());
+			s = service.saveState(s);
+			return mapper.map(s, StateDTO.class);
+		}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 }

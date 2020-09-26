@@ -109,7 +109,7 @@ public class StateControllerTest {
 	
 
 	@Test
-	@DisplayName("Should delete a bank")
+	@DisplayName("Should delete a state")
 	public void deleteBankTest() throws Exception {
 		Long id = 1l;
 		State state = State.builder().id(id).nome("State").uf("ST").build();
@@ -132,8 +132,44 @@ public class StateControllerTest {
 	}
 	
 	
+	@Test
+	@DisplayName("Updating a state")
+	public void updateStateTest() throws Exception{
+		Long id = 1l;
+		
+		State updatingState = State.builder().id(id).nome("some state").uf("SS").build();
+		BDDMockito.given(service.findById(id)).willReturn(Optional.of(updatingState));
+		
+		State updatedState = State.builder().id(id).nome("Ceara").uf("CE").build();
+		BDDMockito.given(service.saveState(updatingState)).willReturn(updatedState);
+		
+		String json = new ObjectMapper().writeValueAsString(createNewDTO());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.put(API_STATE.concat("/"+1))
+				.accept(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(json);
+		
+		mvc.perform(request)
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("nome").value(createNewDTO().getNome()))
+			.andExpect(MockMvcResultMatchers.jsonPath("uf").value(createNewDTO().getUf()));
+	}
 	
-	//ATUALIZAR
+	
+	@Test
+	@DisplayName("Should return not found when try to updating a state")
+	public void notFoundUpdatingStateTest() throws Exception{
+		BDDMockito.given(service.findById(1l)).willReturn(Optional.empty());
+		String json = new ObjectMapper().writeValueAsString(createNewDTO());
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders.put(API_STATE.concat("/"+1))
+				.accept(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+				.content(json);
+		
+		mvc.perform(request).andExpect(MockMvcResultMatchers.status().isNotFound());
+	}
 	
 	//ERRO NÃO ENCONTRAR REGISTRO PRA ATUALIZAR
 	
@@ -143,7 +179,7 @@ public class StateControllerTest {
 	
 	
 	private StateDTO createNewDTO() {
-		return StateDTO.builder().nome("State of Ceara").uf("CE").build();
+		return StateDTO.builder().nome("Ceara").uf("CE").build();
 	}
 
 }
